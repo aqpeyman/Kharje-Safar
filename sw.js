@@ -1,5 +1,5 @@
 // SafarDanesh service worker: caches the app so it installs and works offline.
-const V = "safardanesh-v1"; // bump this number after you change any file
+const V = "safardanesh-v2"; // bump this number after you change any file
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
 const CDN = [
   "https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap",

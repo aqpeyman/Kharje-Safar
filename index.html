@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SafarDanesh – Trip Accountant</title>
+<title>خرج‌سفر</title>
+<script>window.__bip=null;window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__bip=e;window.dispatchEvent(new Event("bip-ready"))});</script>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#4f46e5">
 <link rel="icon" href="icons/icon-192.png">
@@ -31,8 +32,8 @@ const {useState,useEffect,useMemo,useReducer,useContext,createContext,useRef}=Re
 
 /* ============ i18n ============ */
 const T={
-en:{app:"SafarDanesh",sub:"Trip Accountant",households:"Households",expenses:"Expenses",settle:"Settlement",backup:"Backup",add:"Add",edit:"Edit",del:"Delete",name:"Name",headcount:"Headcount",color:"Color",paid:"Paid",share:"Share",net:"Net",owed:"Is owed",owes:"Owes",even:"Even",emptyH:"No households yet. Add your first family or group.",emptyE:"No expenses yet. Record the first one.",emptyS:"Nothing to settle yet.",title:"Title",desc:"Description",amount:"Amount",currency:"Currency",payer:"Paid by",date:"Date & time",category:"Category",split:"Split method",perPerson:"Per person",equal:"Equal per household",trips:"Trips",tripName:"Trip name",tripSaved:"Trip saved",tripDel:"Trip deleted",lastTrip:"At least one trip is required",newTrip:"New trip",whoOwes:"Who owes whom",groupMsg:"Group message",install:"Install",installApp:"Install SafarDanesh on your phone",installHint:"Add it to your home screen and use it like an app, even offline.",iosHint:"In Safari tap Share, then Add to Home Screen.",later:"Later",phone:"Phone",card:"Card number",optional:"optional",dest:"Destination",start:"Start date",end:"End date",notes:"Trip notes",link:"Group link",openGroup:"Open group",copy:"Copy",copied:"Copied",notify:"Notify members",sendSms:"SMS",copySummary:"Copy group summary",active:"Active trip",youPay:"You pay",youGet:"You receive from",noPhone:"No phone",tripsDb:"Trips database",tripInfo:"Trip details",expensesN:"expenses",linkHint:"Telegram / WhatsApp / Eitaa invite link",manual:"Manual",participants:"Participating households",save:"Save",cancel:"Cancel",total:"Total",mismatch:"Entries differ from total by",fill:"Fill remaining",pays:"pays",settled:"Settled",method:"Method",cash:"Cash",transfer:"Bank transfer",wallet:"Wallet",export:"Export JSON",import:"Import JSON",invalid:"Invalid backup file",hAdded:"Household saved",hDel:"Household deleted",inUse:"Household is used in expenses",eAdded:"Expense saved",eDel:"Expense deleted",bDone:"Backup downloaded",restored:"Data restored",confirm:"Delete this item?",members:"members",allDone:"All settled!",needTwo:"Add at least one household first",needPart:"Select at least one participant",needAmt:"Enter a valid amount",impHint:"Restoring replaces all current data.",food:"Food",transport:"Transport",stay:"Accommodation",fun:"Entertainment",other:"Other",IRT:"Toman",USD:"USD",EUR:"EUR",AED:"AED",lang:"فارسی",in:"per currency"},
-fa:{app:"خرج‌سفر",sub:"حسابدار سفر",households:"خانوارها",expenses:"هزینه‌ها",settle:"تسویه حساب",backup:"پشتیبان",add:"افزودن",edit:"ویرایش",del:"حذف",name:"نام",headcount:"تعداد نفرات",color:"رنگ",paid:"پرداختی",share:"سهم مصرف",net:"تراز",owed:"طلبکار",owes:"بدهکار",even:"تسویه",emptyH:"هنوز خانواری ثبت نشده. اولین خانوار را اضافه کنید.",emptyE:"هنوز هزینه‌ای ثبت نشده. اولین هزینه را ثبت کنید.",emptyS:"هنوز چیزی برای تسویه نیست.",title:"عنوان",desc:"توضیحات",amount:"مبلغ",currency:"واحد پول",payer:"پرداخت‌کننده",date:"تاریخ و زمان",category:"دسته‌بندی",split:"روش تقسیم",perPerson:"بر اساس تعداد نفرات",equal:"مساوی بین خانوارها",trips:"سفرها",tripName:"نام سفر",tripSaved:"سفر ذخیره شد",tripDel:"سفر حذف شد",lastTrip:"حداقل یک سفر لازم است",newTrip:"سفر جدید",whoOwes:"چه کسی چقدر به چه کسی بدهکار است",groupMsg:"پیام گروه",install:"نصب",installApp:"نصب خرج‌سفر روی گوشی",installHint:"به صفحه‌ی اصلی گوشی اضافه کنید و مثل یک برنامه (حتی بدون اینترنت) استفاده کنید.",iosHint:"در سافاری دکمه‌ی اشتراک‌گذاری (Share) را بزنید و Add to Home Screen را انتخاب کنید.",later:"بعداً",phone:"شماره تماس",card:"شماره کارت",optional:"اختیاری",dest:"مقصد",start:"تاریخ شروع",end:"تاریخ پایان",notes:"توضیحات سفر",link:"لینک گروه",openGroup:"باز کردن گروه",copy:"کپی",copied:"کپی شد",notify:"اطلاع‌رسانی به نفرات",sendSms:"پیامک",copySummary:"کپی خلاصه برای گروه",active:"سفر فعال",youPay:"پرداخت شما به",youGet:"دریافت شما از",noPhone:"بدون شماره",tripsDb:"پایگاه سفرها",tripInfo:"مشخصات سفر",expensesN:"هزینه",linkHint:"لینک دعوت تلگرام / واتساپ / ایتا",manual:"به صورت دستی",participants:"خانوارهای شرکت‌کننده",save:"ذخیره",cancel:"انصراف",total:"جمع",mismatch:"اختلاف مجموع با مبلغ کل:",fill:"تکمیل باقی‌مانده",pays:"می‌پردازد به",settled:"تسویه شد",method:"روش",cash:"نقد",transfer:"کارت به کارت",wallet:"کیف پول",export:"خروجی JSON",import:"بازیابی JSON",invalid:"فایل پشتیبان نامعتبر است",hAdded:"خانوار ذخیره شد",hDel:"خانوار حذف شد",inUse:"این خانوار در هزینه‌ها استفاده شده",eAdded:"هزینه با موفقیت ثبت شد",eDel:"هزینه حذف شد",bDone:"پشتیبان دانلود شد",restored:"اطلاعات بازیابی شد",confirm:"این مورد حذف شود؟",members:"نفر",allDone:"همه تسویه شدند!",needTwo:"ابتدا یک خانوار اضافه کنید",needPart:"حداقل یک شرکت‌کننده انتخاب کنید",needAmt:"مبلغ معتبر وارد کنید",impHint:"بازیابی، همه اطلاعات فعلی را جایگزین می‌کند.",food:"غذا",transport:"حمل‌ونقل",stay:"اقامت",fun:"تفریح",other:"سایر",IRT:"تومان",USD:"دلار",EUR:"یورو",AED:"درهم",lang:"English",in:"به تفکیک واحد پول"}};
+en:{app:"خرج‌سفر",sub:"Trip expenses",households:"Households",expenses:"Expenses",settle:"Settlement",backup:"Backup",add:"Add",edit:"Edit",del:"Delete",name:"Name",headcount:"Headcount",color:"Color",paid:"Paid",share:"Share",net:"Net",owed:"Is owed",owes:"Owes",even:"Even",emptyH:"No households yet. Add your first family or group.",emptyE:"No expenses yet. Record the first one.",emptyS:"Nothing to settle yet.",title:"Title",desc:"Description",amount:"Amount",currency:"Currency",payer:"Paid by",date:"Date & time",category:"Category",split:"Split method",perPerson:"Per person",equal:"Equal per household",trips:"Trips",tripName:"Trip name",tripSaved:"Trip saved",tripDel:"Trip deleted",lastTrip:"At least one trip is required",newTrip:"New trip",whoOwes:"Who owes whom",groupMsg:"Group message",install:"Install app",helpTitle:"Install the app",helpAndroid:"Android (Chrome): open the ⋮ menu, then tap Install app (or Add to Home screen).",helpIos:"iPhone (Safari): tap the Share button, then Add to Home Screen.",helpNote:"If you opened the link inside Telegram, Instagram or another in-app browser, open it in Chrome or Safari first.",installApp:"Install SafarDanesh on your phone",installHint:"Add it to your home screen and use it like an app, even offline.",iosHint:"In Safari tap Share, then Add to Home Screen.",later:"Later",phone:"Phone",card:"Card number",optional:"optional",dest:"Destination",start:"Start date",end:"End date",notes:"Trip notes",link:"Group link",openGroup:"Open group",copy:"Copy",copied:"Copied",notify:"Notify members",sendSms:"SMS",copySummary:"Copy group summary",active:"Active trip",youPay:"You pay",youGet:"You receive from",noPhone:"No phone",tripsDb:"Trips database",tripInfo:"Trip details",expensesN:"expenses",linkHint:"Telegram / WhatsApp / Eitaa invite link",manual:"Manual",participants:"Participating households",save:"Save",cancel:"Cancel",total:"Total",mismatch:"Entries differ from total by",fill:"Fill remaining",pays:"pays",settled:"Settled",method:"Method",cash:"Cash",transfer:"Bank transfer",wallet:"Wallet",export:"Export JSON",import:"Import JSON",invalid:"Invalid backup file",hAdded:"Household saved",hDel:"Household deleted",inUse:"Household is used in expenses",eAdded:"Expense saved",eDel:"Expense deleted",bDone:"Backup downloaded",restored:"Data restored",confirm:"Delete this item?",members:"members",allDone:"All settled!",needTwo:"Add at least one household first",needPart:"Select at least one participant",needAmt:"Enter a valid amount",impHint:"Restoring replaces all current data.",food:"Food",transport:"Transport",stay:"Accommodation",fun:"Entertainment",other:"Other",IRT:"Toman",USD:"USD",EUR:"EUR",AED:"AED",lang:"فارسی",in:"per currency"},
+fa:{app:"خرج‌سفر",sub:"حسابدار سفر",households:"خانوارها",expenses:"هزینه‌ها",settle:"تسویه حساب",backup:"پشتیبان",add:"افزودن",edit:"ویرایش",del:"حذف",name:"نام",headcount:"تعداد نفرات",color:"رنگ",paid:"پرداختی",share:"سهم مصرف",net:"تراز",owed:"طلبکار",owes:"بدهکار",even:"تسویه",emptyH:"هنوز خانواری ثبت نشده. اولین خانوار را اضافه کنید.",emptyE:"هنوز هزینه‌ای ثبت نشده. اولین هزینه را ثبت کنید.",emptyS:"هنوز چیزی برای تسویه نیست.",title:"عنوان",desc:"توضیحات",amount:"مبلغ",currency:"واحد پول",payer:"پرداخت‌کننده",date:"تاریخ و زمان",category:"دسته‌بندی",split:"روش تقسیم",perPerson:"بر اساس تعداد نفرات",equal:"مساوی بین خانوارها",trips:"سفرها",tripName:"نام سفر",tripSaved:"سفر ذخیره شد",tripDel:"سفر حذف شد",lastTrip:"حداقل یک سفر لازم است",newTrip:"سفر جدید",whoOwes:"چه کسی چقدر به چه کسی بدهکار است",groupMsg:"پیام گروه",install:"نصب اپ",helpTitle:"نصب اپ",helpAndroid:"اندروید (Chrome): منوی ⋮ را باز کنید و Install app (یا Add to Home screen) را بزنید.",helpIos:"آیفون (Safari): دکمه‌ی Share را بزنید و Add to Home Screen را انتخاب کنید.",helpNote:"اگر لینک را داخل تلگرام، اینستاگرام یا مرورگر داخلی برنامه‌ای باز کرده‌اید، اول آن را در Chrome یا Safari باز کنید.",installApp:"نصب سفردانش روی گوشی",installHint:"به صفحه‌ی اصلی گوشی اضافه کنید و مثل یک برنامه (حتی بدون اینترنت) استفاده کنید.",iosHint:"در سافاری دکمه‌ی اشتراک‌گذاری (Share) را بزنید و Add to Home Screen را انتخاب کنید.",later:"بعداً",phone:"شماره تماس",card:"شماره کارت",optional:"اختیاری",dest:"مقصد",start:"تاریخ شروع",end:"تاریخ پایان",notes:"توضیحات سفر",link:"لینک گروه",openGroup:"باز کردن گروه",copy:"کپی",copied:"کپی شد",notify:"اطلاع‌رسانی به نفرات",sendSms:"پیامک",copySummary:"کپی خلاصه برای گروه",active:"سفر فعال",youPay:"پرداخت شما به",youGet:"دریافت شما از",noPhone:"بدون شماره",tripsDb:"پایگاه سفرها",tripInfo:"مشخصات سفر",expensesN:"هزینه",linkHint:"لینک دعوت تلگرام / واتساپ / ایتا",manual:"به صورت دستی",participants:"خانوارهای شرکت‌کننده",save:"ذخیره",cancel:"انصراف",total:"جمع",mismatch:"اختلاف مجموع با مبلغ کل:",fill:"تکمیل باقی‌مانده",pays:"می‌پردازد به",settled:"تسویه شد",method:"روش",cash:"نقد",transfer:"کارت به کارت",wallet:"کیف پول",export:"خروجی JSON",import:"بازیابی JSON",invalid:"فایل پشتیبان نامعتبر است",hAdded:"خانوار ذخیره شد",hDel:"خانوار حذف شد",inUse:"این خانوار در هزینه‌ها استفاده شده",eAdded:"هزینه با موفقیت ثبت شد",eDel:"هزینه حذف شد",bDone:"پشتیبان دانلود شد",restored:"اطلاعات بازیابی شد",confirm:"این مورد حذف شود؟",members:"نفر",allDone:"همه تسویه شدند!",needTwo:"ابتدا یک خانوار اضافه کنید",needPart:"حداقل یک شرکت‌کننده انتخاب کنید",needAmt:"مبلغ معتبر وارد کنید",impHint:"بازیابی، همه اطلاعات فعلی را جایگزین می‌کند.",food:"غذا",transport:"حمل‌ونقل",stay:"اقامت",fun:"تفریح",other:"سایر",IRT:"تومان",USD:"دلار",EUR:"یورو",AED:"درهم",lang:"English",in:"به تفکیک واحد پول"}};
 const COLORS=["#6366f1","#10b981","#f59e0b","#ef4444","#06b6d4","#ec4899","#8b5cf6","#84cc16"];
 const CATS=["food","transport","stay","fun","other"],CURS=["IRT","USD","EUR","AED"];
 
@@ -118,10 +119,10 @@ const P={sms:"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",use
 const Btn=({children,v="p",className="",...p})=><button {...p} className={"inline-flex items-center justify-center gap-2 px-4 py-2 rounded-2xl text-sm font-semibold transition active:scale-95 "+(v==="p"?"bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm":v==="d"?"bg-rose-50 text-rose-600 hover:bg-rose-100":"bg-white text-slate-700 border border-slate-200 hover:bg-slate-50")+" "+className}>{children}</button>;
 const Card=({children,className=""})=><div className={"bg-white rounded-2xl shadow-sm hover:shadow-md transition p-4 "+className}>{children}</div>;
 const Empty=({icon,text,action})=><div className="fade text-center py-14 px-6"><div className="mx-auto w-16 h-16 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4"><Ic d={icon} c="w-8 h-8"/></div><p className="text-slate-500 mb-4">{text}</p>{action}</div>;
-const Field=({label,children})=><label className="block text-sm text-slate-600 mb-3"><span className="block mb-1 font-semibold">{label}</span>{children}</label>;
-const inp="w-full rounded-xl border border-slate-200 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400";
+const Field=({label,children})=><label className="block text-xs text-slate-600 mb-2.5"><span className="block mb-1 font-semibold text-slate-500">{label}</span>{children}</label>;
+const inp="w-full rounded-lg border border-indigo-200 bg-indigo-50/50 px-2.5 py-1.5 text-sm placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
 const Modal=({title,onClose,children})=><div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 backdrop-blur-sm p-0 sm:p-4" onClick={onClose}>
-  <div className="fade bg-white w-full sm:max-w-lg max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl shadow-xl p-5" onClick={e=>e.stopPropagation()}>
+  <div className="fade bg-white w-full sm:max-w-lg max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl shadow-xl p-4" onClick={e=>e.stopPropagation()}>
     <div className="flex items-center justify-between mb-4"><h3 className="text-lg font-bold">{title}</h3><button onClick={onClose} className="p-1 rounded-full hover:bg-slate-100"><Ic d={P.x}/></button></div>{children}</div></div>;
 const Money=({v,cur})=>{const {num,t}=useApp();return <span dir="ltr" className="whitespace-nowrap">{num(v)} <span className="text-xs text-slate-400">{t(cur)}</span></span>};
 
@@ -162,7 +163,7 @@ function ExpenseForm({e,onClose}){
         <span style={{background:h.color}} className="w-3 h-3 rounded-full"/>
         <span className="flex-1 text-sm">{h.name} <span className="text-xs text-slate-400">({num(h.headcount,0)})</span></span>
         {on&&(f.mode==="manual"?<>
-          <input type="number" min="0" className="w-24 rounded-lg border border-slate-200 px-2 py-1 text-sm" value={f.manual[h.id]??""} onChange={x=>setF({...f,manual:{...f.manual,[h.id]:x.target.value}})}/>
+          <input type="number" min="0" className="w-20 rounded-lg border border-indigo-200 bg-indigo-50/50 px-2 py-1 text-sm focus:outline-none focus:bg-white focus:border-indigo-500" value={f.manual[h.id]??""} onChange={x=>setF({...f,manual:{...f.manual,[h.id]:x.target.value}})}/>
           <button type="button" title={t("fill")} onClick={()=>fill(h.id)} className="text-xs px-2 py-1 rounded-lg bg-indigo-100 text-indigo-700">+</button></>
           :<span className="text-sm font-semibold" dir="ltr">{num(sh||0)}</span>)}
       </div>})}</div>
@@ -248,7 +249,7 @@ function DateField({value,onChange,clearable}){
   const ch=(i,v)=>{const p=cur.map((x,k)=>x===""?td[k]:x);p[i]=Number(v);p[2]=Math.min(p[2],maxDay(p[0],p[1]));
     const [gy,gm,gd]=j2g(...p);onChange(gy+"-"+p2(gm)+"-"+p2(gd));};
   const ys=[];for(let y=td[0]-3;y<=td[0]+3;y++)ys.push(y);if(cur[0]&&!ys.includes(cur[0]))ys.push(cur[0]);
-  const sel="rounded-xl border border-slate-200 px-2 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400";
+  const sel="rounded-lg border border-indigo-200 bg-indigo-50/50 px-1.5 py-1.5 text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
   return <div className="flex gap-1 items-center" dir="rtl">
     <select className={sel+" w-16"} value={cur[2]} onChange={e=>ch(2,e.target.value)}>{value?null:<option value="">—</option>}{Array.from({length:cur[1]?maxDay(cur[0],cur[1]):31},(_,i)=>i+1).map(d=><option key={d} value={d}>{faNum(d)}</option>)}</select>
     <select className={sel+" flex-1"} value={cur[1]} onChange={e=>ch(1,e.target.value)}>{value?null:<option value="">—</option>}{JM.map((m,i)=><option key={i} value={i+1}>{m}</option>)}</select>
@@ -262,7 +263,7 @@ function DateTimeField({value,onChange}){
   const [d,tm]=(value||"").split("T");
   return <div className="flex gap-2 items-center flex-wrap">
     <DateField value={d||""} onChange={v=>onChange(v+"T"+(tm||"12:00"))}/>
-    <input type="time" dir="ltr" className="rounded-xl border border-slate-200 px-2 py-2 text-sm" value={tm||"12:00"} onChange={e=>onChange((d||todayISO())+"T"+e.target.value)}/>
+    <input type="time" dir="ltr" className="rounded-lg border border-indigo-200 bg-indigo-50/50 px-1.5 py-1.5 text-sm focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" value={tm||"12:00"} onChange={e=>onChange((d||todayISO())+"T"+e.target.value)}/>
   </div>;
 }
 const fmtDate=(d,lang,withTime)=>{if(!d)return"";try{const x=new Date(d.length>10?d:d+"T00:00");return x.toLocaleString(lang==="fa"?"fa-IR-u-ca-persian":"en-GB",withTime?{dateStyle:"medium",timeStyle:"short"}:{dateStyle:"medium"})}catch{return d}};
@@ -322,11 +323,11 @@ function TripForm({tr,onClose}){
     <Field label={t("notes")}><textarea rows="2" className={inp} value={f.notes} onChange={on("notes")}/></Field>
     <Field label={t("link")+" ("+t("optional")+")"}><input dir="ltr" className={inp} value={f.link} placeholder="https://t.me/..." onChange={on("link")}/><span className="block text-xs text-slate-400 mt-1">{t("linkHint")}</span></Field>
     <div className="flex items-center justify-between mt-2 mb-2"><div className="font-bold">{t("households")}</div><Btn v="s" className="!py-1 !px-3" onClick={addH}><Ic d={P.plus} c="w-4 h-4"/>{t("add")}</Btn></div>
-    <div className="space-y-3 mb-4">{hs.map((h,i)=><div key={h.id} className="rounded-2xl border border-slate-200 p-3 space-y-2">
+    <div className="space-y-3 mb-4">{hs.map((h,i)=><div key={h.id} className="rounded-xl border border-indigo-100 bg-slate-50 p-2.5 space-y-1.5">
       <div className="flex items-center gap-2">
-        <button type="button" title={t("color")} onClick={()=>hset(i,"color",COLORS[(COLORS.indexOf(h.color)+1)%COLORS.length])} style={{background:h.color}} className="w-8 h-8 rounded-full shrink-0"/>
+        <button type="button" title={t("color")} onClick={()=>hset(i,"color",COLORS[(COLORS.indexOf(h.color)+1)%COLORS.length])} style={{background:h.color}} className="w-7 h-7 rounded-full shrink-0"/>
         <input className={inp} placeholder={t("name")} value={h.name} onChange={e=>hset(i,"name",e.target.value)}/>
-        <input type="number" min="1" className={inp+" !w-20"} title={t("headcount")} value={h.headcount} onChange={e=>hset(i,"headcount",e.target.value)}/>
+        <input type="number" min="1" className={inp+" !w-16"} title={t("headcount")} value={h.headcount} onChange={e=>hset(i,"headcount",e.target.value)}/>
         <button type="button" onClick={()=>rmH(i)} className="p-2 rounded-xl text-rose-600 hover:bg-rose-50"><Ic d={P.trash} c="w-4 h-4"/></button></div>
       <div className="grid sm:grid-cols-2 gap-2">
         <input type="tel" dir="ltr" className={inp} placeholder={t("phone")+" ("+t("optional")+")"} value={h.phone} onChange={e=>hset(i,"phone",e.target.value)}/>
@@ -392,23 +393,31 @@ function Owes(){
       </div>}))}</div></Card>;
 }
 
-/* ============ PWA install prompt ============ */
-function InstallBanner(){
-  const {t}=useApp();
-  const [ev,setEv]=useState(null);
-  const [hide,setHide]=useState(()=>{try{return localStorage.getItem("sd-install-hide")==="1"}catch{return false}});
+/* ============ PWA install ============ */
+function useInstall(){
+  const [ev,setEv]=useState(window.__bip||null); // the event may fire before React mounts, so index.html captures it
+  useEffect(()=>{const h=()=>setEv(window.__bip||null),a=()=>{window.__bip=null;setEv(null)};
+    window.addEventListener("bip-ready",h);window.addEventListener("appinstalled",a);
+    return()=>{window.removeEventListener("bip-ready",h);window.removeEventListener("appinstalled",a)}},[]);
   const standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone;
-  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  useEffect(()=>{const h=e=>{e.preventDefault();setEv(e)};const a=()=>setEv(null);
-    window.addEventListener("beforeinstallprompt",h);window.addEventListener("appinstalled",a);
-    return()=>{window.removeEventListener("beforeinstallprompt",h);window.removeEventListener("appinstalled",a)}},[]);
+  const run=async()=>{const e=window.__bip;if(!e)return;e.prompt();try{await e.userChoice}catch{}window.__bip=null;setEv(null)};
+  return {ev,standalone,run};
+}
+function InstallBtn(){
+  const {t}=useApp();const {ev,standalone,run}=useInstall();const [help,setHelp]=useState(false);
+  if(standalone)return null;
+  return <><Btn onClick={()=>ev?run():setHelp(true)}><Ic d={P.dl} c="w-4 h-4"/>{t("install")}</Btn>
+    {help&&<Modal title={t("helpTitle")} onClose={()=>setHelp(false)}>
+      <div className="space-y-3 text-sm text-slate-600"><p>{t("helpAndroid")}</p><p>{t("helpIos")}</p><p className="text-xs text-slate-400">{t("helpNote")}</p></div></Modal>}</>;
+}
+function InstallBanner(){
+  const {t}=useApp();const {ev,standalone,run}=useInstall();
+  const [hide,setHide]=useState(()=>{try{return localStorage.getItem("sd-install-hide")==="1"}catch{return false}});
   const close=()=>{setHide(true);try{localStorage.setItem("sd-install-hide","1")}catch{}};
-  if(standalone||hide||(!ev&&!ios))return null;
+  if(standalone||hide||!ev)return null;
   return <div className="fade fixed inset-x-4 bottom-20 md:bottom-4 md:inset-x-auto md:end-4 md:max-w-sm z-40 bg-slate-900 text-white rounded-2xl shadow-xl p-4">
-    <div className="font-bold mb-1">{t("installApp")}</div>
-    <div className="text-xs text-slate-300 mb-3">{ev?t("installHint"):t("iosHint")}</div>
-    <div className="flex gap-2 justify-end"><Btn v="s" className="!py-1" onClick={close}>{t("later")}</Btn>
-      {ev&&<Btn className="!py-1" onClick={async()=>{ev.prompt();try{await ev.userChoice}catch{}setEv(null)}}>{t("install")}</Btn>}</div></div>;
+    <div className="font-bold mb-1">{t("installApp")}</div><div className="text-xs text-slate-300 mb-3">{t("installHint")}</div>
+    <div className="flex gap-2 justify-end"><Btn v="s" className="!py-1" onClick={close}>{t("later")}</Btn><Btn className="!py-1" onClick={run}>{t("install")}</Btn></div></div>;
 }
 
 /* ============ Shell ============ */
@@ -424,7 +433,7 @@ function App(){
     <main className="flex-1 max-w-4xl w-full mx-auto p-4 pb-28 md:pb-8">
       <header className="flex items-center justify-between mb-5 md:justify-end">
         <div className="md:hidden font-bold text-lg text-indigo-600">{t("app")}</div>
-        <Btn v="s" onClick={()=>upd(st=>({...st,lang:st.lang==="en"?"fa":"en"}))}><Ic d={P.globe} c="w-4 h-4"/>{t("lang")}</Btn></header>
+        <div className="flex gap-2"><InstallBtn/><Btn v="s" onClick={()=>upd(st=>({...st,lang:st.lang==="en"?"fa":"en"}))}><Ic d={P.globe} c="w-4 h-4"/>{t("lang")}</Btn></div></header>
       <div className="text-xs text-slate-400 mb-3">{t("active")}: <b className="text-slate-600">{s.name}</b></div>
       <div key={tab+s.lang+R.activeId} className="fade"><View/></div></main>
     <InstallBanner/>
