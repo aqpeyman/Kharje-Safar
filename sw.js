@@ -1,6 +1,6 @@
 // SafarDanesh service worker: caches the app so it installs and works offline.
-const V = "safardanesh-v2"; // bump this number after you change any file
-const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
+const V = "safardanesh-v3"; // bump this number after you change any file
+const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 const CDN = [
   "https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap",
   "https://cdn.tailwindcss.com/3.4.17",
@@ -12,7 +12,7 @@ const CDN = [
 self.addEventListener("install", e => {
   e.waitUntil((async () => {
     const c = await caches.open(V);
-    await c.addAll(CORE);
+    await Promise.all(CORE.map(u => c.add(u).catch(() => {}))); // one missing file must not break install
     await Promise.all(CDN.map(u => c.add(new Request(u, { mode: "no-cors" })).catch(() => {})));
     self.skipWaiting();
   })());
