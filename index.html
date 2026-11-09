@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SafarDanesh – Trip Accountant</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#4f46e5">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="سفردانش">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:#f1f5f9;color:#0f172a;font-family:Gandom,Vazirmatn,Tahoma,system-ui,sans-serif;margin:0}
+.fade{animation:f .2s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
+<script type="text/babel">
+const {useState,useEffect,useMemo,useReducer,useContext,createContext,useRef}=React;
+
+/* ============ i18n ============ */
+const T={
+en:{app:"SafarDanesh",sub:"Trip Accountant",households:"Households",expenses:"Expenses",settle:"Settlement",backup:"Backup",add:"Add",edit:"Edit",del:"Delete",name:"Name",headcount:"Headcount",color:"Color",paid:"Paid",share:"Share",net:"Net",owed:"Is owed",owes:"Owes",even:"Even",emptyH:"No households yet. Add your first family or group.",emptyE:"No expenses yet. Record the first one.",emptyS:"Nothing to settle yet.",title:"Title",desc:"Description",amount:"Amount",currency:"Currency",payer:"Paid by",date:"Date & time",category:"Category",split:"Split method",perPerson:"Per person",equal:"Equal per household",trips:"Trips",tripName:"Trip name",tripSaved:"Trip saved",tripDel:"Trip deleted",lastTrip:"At least one trip is required",newTrip:"New trip",whoOwes:"Who owes whom",groupMsg:"Group message",install:"Install",installApp:"Install SafarDanesh on your phone",installHint:"Add it to your home screen and use it like an app, even offline.",iosHint:"In Safari tap Share, then Add to Home Screen.",later:"Later",phone:"Phone",card:"Card number",optional:"optional",dest:"Destination",start:"Start date",end:"End date",notes:"Trip notes",link:"Group link",openGroup:"Open group",copy:"Copy",copied:"Copied",notify:"Notify members",sendSms:"SMS",copySummary:"Copy group summary",active:"Active trip",youPay:"You pay",youGet:"You receive from",noPhone:"No phone",tripsDb:"Trips database",tripInfo:"Trip details",expensesN:"expenses",linkHint:"Telegram / WhatsApp / Eitaa invite link",manual:"Manual",participants:"Participating households",save:"Save",cancel:"Cancel",total:"Total",mismatch:"Entries differ from total by",fill:"Fill remaining",pays:"pays",settled:"Settled",method:"Method",cash:"Cash",transfer:"Bank transfer",wallet:"Wallet",export:"Export JSON",import:"Import JSON",invalid:"Invalid backup file",hAdded:"Household saved",hDel:"Household deleted",inUse:"Household is used in expenses",eAdded:"Expense saved",eDel:"Expense deleted",bDone:"Backup downloaded",restored:"Data restored",confirm:"Delete this item?",members:"members",allDone:"All settled!",needTwo:"Add at least one household first",needPart:"Select at least one participant",needAmt:"Enter a valid amount",impHint:"Restoring replaces all current data.",food:"Food",transport:"Transport",stay:"Accommodation",fun:"Entertainment",other:"Other",IRT:"Toman",USD:"USD",EUR:"EUR",AED:"AED",lang:"فارسی",in:"per currency"},
+fa:{app:"سفردانش",sub:"حسابدار سفر",households:"خانوارها",expenses:"هزینه‌ها",settle:"تسویه حساب",backup:"پشتیبان",add:"افزودن",edit:"ویرایش",del:"حذف",name:"نام",headcount:"تعداد نفرات",color:"رنگ",paid:"پرداختی",share:"سهم مصرف",net:"تراز",owed:"طلبکار",owes:"بدهکار",even:"تسویه",emptyH:"هنوز خانواری ثبت نشده. اولین خانوار را اضافه کنید.",emptyE:"هنوز هزینه‌ای ثبت نشده. اولین هزینه را ثبت کنید.",emptyS:"هنوز چیزی برای تسویه نیست.",title:"عنوان",desc:"توضیحات",amount:"مبلغ",currency:"واحد پول",payer:"پرداخت‌کننده",date:"تاریخ و زمان",category:"دسته‌بندی",split:"روش تقسیم",perPerson:"بر اساس تعداد نفرات",equal:"مساوی بین خانوارها",trips:"سفرها",tripName:"نام سفر",tripSaved:"سفر ذخیره شد",tripDel:"سفر حذف شد",lastTrip:"حداقل یک سفر لازم است",newTrip:"سفر جدید",whoOwes:"چه کسی چقدر به چه کسی بدهکار است",groupMsg:"پیام گروه",install:"نصب",installApp:"نصب سفردانش روی گوشی",installHint:"به صفحه‌ی اصلی گوشی اضافه کنید و مثل یک برنامه (حتی بدون اینترنت) استفاده کنید.",iosHint:"در سافاری دکمه‌ی اشتراک‌گذاری (Share) را بزنید و Add to Home Screen را انتخاب کنید.",later:"بعداً",phone:"شماره تماس",card:"شماره کارت",optional:"اختیاری",dest:"مقصد",start:"تاریخ شروع",end:"تاریخ پایان",notes:"توضیحات سفر",link:"لینک گروه",openGroup:"باز کردن گروه",copy:"کپی",copied:"کپی شد",notify:"اطلاع‌رسانی به نفرات",sendSms:"پیامک",copySummary:"کپی خلاصه برای گروه",active:"سفر فعال",youPay:"پرداخت شما به",youGet:"دریافت شما از",noPhone:"بدون شماره",tripsDb:"پایگاه سفرها",tripInfo:"مشخصات سفر",expensesN:"هزینه",linkHint:"لینک دعوت تلگرام / واتساپ / ایتا",manual:"به صورت دستی",participants:"خانوارهای شرکت‌کننده",save:"ذخیره",cancel:"انصراف",total:"جمع",mismatch:"اختلاف مجموع با مبلغ کل:",fill:"تکمیل باقی‌مانده",pays:"می‌پردازد به",settled:"تسویه شد",method:"روش",cash:"نقد",transfer:"کارت به کارت",wallet:"کیف پول",export:"خروجی JSON",import:"بازیابی JSON",invalid:"فایل پشتیبان نامعتبر است",hAdded:"خانوار ذخیره شد",hDel:"خانوار حذف شد",inUse:"این خانوار در هزینه‌ها استفاده شده",eAdded:"هزینه با موفقیت ثبت شد",eDel:"هزینه حذف شد",bDone:"پشتیبان دانلود شد",restored:"اطلاعات بازیابی شد",confirm:"این مورد حذف شود؟",members:"نفر",allDone:"همه تسویه شدند!",needTwo:"ابتدا یک خانوار اضافه کنید",needPart:"حداقل یک شرکت‌کننده انتخاب کنید",needAmt:"مبلغ معتبر وارد کنید",impHint:"بازیابی، همه اطلاعات فعلی را جایگزین می‌کند.",food:"غذا",transport:"حمل‌ونقل",stay:"اقامت",fun:"تفریح",other:"سایر",IRT:"تومان",USD:"دلار",EUR:"یورو",AED:"درهم",lang:"English",in:"به تفکیک واحد پول"}};
+const COLORS=["#6366f1","#10b981","#f59e0b","#ef4444","#06b6d4","#ec4899","#8b5cf6","#84cc16"];
+const CATS=["food","transport","stay","fun","other"],CURS=["IRT","USD","EUR","AED"];
+
+/* ============ pure utils ============ */
+const r2=n=>Math.round((n+Number.EPSILON)*100)/100;
+const uid=()=>Math.random().toString(36).slice(2,9);
+// shares per household for one expense
+function computeShares(e,hs){
+  const ids=e.participants.filter(id=>hs.some(h=>h.id===id)),out={};
+  if(!ids.length)return out;
+  if(e.mode==="manual"){ids.forEach(id=>out[id]=Number(e.manual?.[id])||0);return out;}
+  if(e.mode==="equal"){ids.forEach(id=>out[id]=e.amount/ids.length);return out;} // same share per household
+  const tot=ids.reduce((s,id)=>s+hs.find(h=>h.id===id).headcount,0)||1;
+  const perHead=e.amount/tot; // Share per member
+  ids.forEach(id=>out[id]=perHead*hs.find(h=>h.id===id).headcount);
+  return out;
+}
+// net balances: {currency:{hid:{paid,share,net}}}
+function ledger(hs,es){
+  const L={};
+  es.forEach(e=>{
+    const c=L[e.currency]??={};
+    hs.forEach(h=>c[h.id]??={paid:0,share:0,net:0});
+    if(c[e.payer])c[e.payer].paid+=e.amount;
+    const sh=computeShares(e,hs);for(const id in sh)if(c[id])c[id].share+=sh[id];
+  });
+  for(const cur in L)for(const id in L[cur]){const x=L[cur][id];x.net=r2(x.paid-x.share);}
+  return L;
+}
+// greedy debt minimisation: match largest debtor with largest creditor
+function simplify(bal){
+  const cr=[],db=[],out=[];
+  for(const id in bal){const n=bal[id].net;if(n>0.01)cr.push({id,n});else if(n<-0.01)db.push({id,n:-n});}
+  while(cr.length&&db.length){
+    cr.sort((a,b)=>b.n-a.n);db.sort((a,b)=>b.n-a.n);
+    const c=cr[0],d=db[0],a=r2(Math.min(c.n,d.n));
+    out.push({from:d.id,to:c.id,amount:a});
+    c.n=r2(c.n-a);d.n=r2(d.n-a);
+    if(c.n<=0.01)cr.shift();if(d.n<=0.01)db.shift();
+  }
+  return out;
+}
+
+/* ============ state ============ */
+const mkTrip=(name,o={})=>({id:uid(),name,dest:"",start:"",end:"",notes:"",link:"",households:[],expenses:[],settled:{},currencies:CURS,categories:CATS,...o});
+const validTrip=x=>x&&Array.isArray(x.households)&&Array.isArray(x.expenses)&&x.households.every(h=>h.id&&h.name&&h.headcount>=1)&&x.expenses.every(e=>e.id&&e.payer&&typeof e.amount==="number"&&Array.isArray(e.participants));
+// accepts the multi-trip format and migrates the old single-trip format
+function normalize(d){
+  if(!d||typeof d!=="object")return null;
+  if(Array.isArray(d.trips)){if(!d.trips.length||!d.trips.every(x=>x&&x.id&&validTrip(x)))return null;
+    return {lang:d.lang||"en",trips:d.trips.map(x=>({...mkTrip(x.name||"Trip"),...x})),activeId:d.trips.some(x=>x.id===d.activeId)?d.activeId:d.trips[0].id};}
+  if(validTrip(d)){const tr=mkTrip(d.name||"Trip 1",d);tr.id=uid();return {lang:d.lang||"en",trips:[tr],activeId:tr.id};}
+  return null;
+}
+const load=()=>{try{const x=normalize(JSON.parse(localStorage.getItem("safardanesh")||"null"));if(x)return x}catch{}const tr=mkTrip("Trip 1");return {lang:"en",trips:[tr],activeId:tr.id}};
+const reduce=(s,a)=>a.type==="set"?a.v:a.fn(s);
+const Ctx=createContext();
+const useApp=()=>useContext(Ctx);
+function Provider({children}){
+  const [R,d]=useReducer(reduce,null,load);
+  const [dlg,setDlg]=useState(null);
+  const trip=R.trips.find(x=>x.id===R.activeId)||R.trips[0];
+  const s={...trip,lang:R.lang}; // active trip + language
+  const [toasts,setToasts]=useState([]);
+  useEffect(()=>{try{localStorage.setItem("safardanesh",JSON.stringify(R))}catch{}},[R]);
+  useEffect(()=>{document.documentElement.dir=s.lang==="fa"?"rtl":"ltr";document.documentElement.lang=s.lang;},[s.lang]);
+  const t=k=>T[s.lang][k]??k;
+  const num=(n,dg=2)=>Number(n).toLocaleString(s.lang==="fa"?"fa-IR":"en-US",{maximumFractionDigits:dg});
+  const toast=(m,err)=>{const id=uid();setToasts(x=>[...x,{id,m,err}]);setTimeout(()=>setToasts(x=>x.filter(y=>y.id!==id)),2800)};
+  const upd=fn=>d({type:"fn",fn:R0=>{const tr=R0.trips.find(x=>x.id===R0.activeId)||R0.trips[0];const {lang,...rest}=fn({...tr,lang:R0.lang});return {...R0,lang,trips:R0.trips.map(x=>x.id===tr.id?{...tr,...rest}:x)}}});
+  const raw=fn=>d({type:"fn",fn});
+  const ask=fn=>setDlg({fn});
+  return <Ctx.Provider value={{s,R,t,num,upd,raw,ask,set:v=>d({type:"set",v}),toast}}>{children}
+    {dlg&&<Modal title={t("confirm")} onClose={()=>setDlg(null)}><div className="flex gap-2 justify-end"><Btn v="s" onClick={()=>setDlg(null)}>{t("cancel")}</Btn><Btn v="d" onClick={()=>{const f=dlg.fn;setDlg(null);f()}}>{t("del")}</Btn></div></Modal>}
+    <div className="fixed top-4 inset-x-4 z-[60] flex flex-col items-center gap-2 pointer-events-none">
+      {toasts.map(x=><div key={x.id} className={"fade px-4 py-2 rounded-2xl shadow-xl text-white text-sm "+(x.err?"bg-rose-600":"bg-slate-900")}>{x.m}</div>)}
+    </div></Ctx.Provider>;
+}
+
+/* ============ UI bits ============ */
+const Ic=({d,c="w-5 h-5"})=><svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d}/></svg>;
+const P={sms:"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",users:"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8",wallet:"M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z",swap:"M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3",db:"M12 8c4.4 0 8-1.3 8-3s-3.6-3-8-3-8 1.3-8 3 3.6 3 8 3zM4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3",plus:"M12 5v14M5 12h14",edit:"M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z",trash:"M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6",x:"M18 6L6 18M6 6l12 12",dl:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3",ul:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12",check:"M20 6L9 17l-5-5",globe:"M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"};
+const Btn=({children,v="p",className="",...p})=><button {...p} className={"inline-flex items-center justify-center gap-2 px-4 py-2 rounded-2xl text-sm font-semibold transition active:scale-95 "+(v==="p"?"bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm":v==="d"?"bg-rose-50 text-rose-600 hover:bg-rose-100":"bg-white text-slate-700 border border-slate-200 hover:bg-slate-50")+" "+className}>{children}</button>;
+const Card=({children,className=""})=><div className={"bg-white rounded-2xl shadow-sm hover:shadow-md transition p-4 "+className}>{children}</div>;
+const Empty=({icon,text,action})=><div className="fade text-center py-14 px-6"><div className="mx-auto w-16 h-16 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4"><Ic d={icon} c="w-8 h-8"/></div><p className="text-slate-500 mb-4">{text}</p>{action}</div>;
+const Field=({label,children})=><label className="block text-sm text-slate-600 mb-3"><span className="block mb-1 font-semibold">{label}</span>{children}</label>;
+const inp="w-full rounded-xl border border-slate-200 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400";
+const Modal=({title,onClose,children})=><div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 backdrop-blur-sm p-0 sm:p-4" onClick={onClose}>
+  <div className="fade bg-white w-full sm:max-w-lg max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl shadow-xl p-5" onClick={e=>e.stopPropagation()}>
+    <div className="flex items-center justify-between mb-4"><h3 className="text-lg font-bold">{title}</h3><button onClick={onClose} className="p-1 rounded-full hover:bg-slate-100"><Ic d={P.x}/></button></div>{children}</div></div>;
+const Money=({v,cur})=>{const {num,t}=useApp();return <span dir="ltr" className="whitespace-nowrap">{num(v)} <span className="text-xs text-slate-400">{t(cur)}</span></span>};
+
+/* ============ Expenses ============ */
+const nowLocal=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)};
+function ExpenseForm({e,onClose}){
+  const {s,t,upd,toast,num}=useApp();
+  const hs=s.households;
+  const [f,setF]=useState(e||{title:"",desc:"",amount:"",currency:"IRT",payer:hs[0]?.id,date:nowLocal(),category:"food",mode:"person",participants:hs.map(h=>h.id),manual:{}});
+  const amt=Number(f.amount)||0;
+  const manualSum=r2(f.participants.reduce((a,id)=>a+(Number(f.manual[id])||0),0));
+  const diff=r2(amt-manualSum);
+  const bad=f.mode==="manual"&&Math.abs(diff)>0.005;
+  const toggle=id=>setF({...f,participants:f.participants.includes(id)?f.participants.filter(x=>x!==id):[...f.participants,id]});
+  const fill=id=>setF({...f,manual:{...f.manual,[id]:r2((Number(f.manual[id])||0)+diff)}});
+  const save=()=>{
+    if(amt<=0||!f.title.trim())return toast(t("needAmt"),1);
+    if(!f.participants.length)return toast(t("needPart"),1);
+    if(bad)return;
+    const rec={...f,amount:amt,id:e?.id||uid()};
+    upd(st=>({...st,expenses:e?st.expenses.map(x=>x.id===e.id?rec:x):[rec,...st.expenses]}));
+    toast(t("eAdded"));onClose();};
+  return <Modal title={t(e?"edit":"add")+" – "+t("expenses")} onClose={onClose}>
+    <Field label={t("title")}><input className={inp} value={f.title} onChange={x=>setF({...f,title:x.target.value})}/></Field>
+    <Field label={t("desc")}><input className={inp} value={f.desc} onChange={x=>setF({...f,desc:x.target.value})}/></Field>
+    <div className="grid grid-cols-2 gap-3">
+      <Field label={t("amount")}><input type="number" min="0" className={inp} value={f.amount} onChange={x=>setF({...f,amount:x.target.value})}/></Field>
+      <Field label={t("currency")}><select className={inp} value={f.currency} onChange={x=>setF({...f,currency:x.target.value})}>{s.currencies.map(c=><option key={c} value={c}>{t(c)}</option>)}</select></Field>
+      <Field label={t("payer")}><select className={inp} value={f.payer} onChange={x=>setF({...f,payer:x.target.value})}>{hs.map(h=><option key={h.id} value={h.id}>{h.name}</option>)}</select></Field>
+      <Field label={t("category")}><select className={inp} value={f.category} onChange={x=>setF({...f,category:x.target.value})}>{s.categories.map(c=><option key={c} value={c}>{t(c)}</option>)}</select></Field>
+    </div>
+    <Field label={t("date")}><DateTimeField value={f.date} onChange={v=>setF({...f,date:v})}/></Field>
+    <Field label={t("split")}><div className="grid grid-cols-3 gap-2">{[["person","perPerson"],["equal","equal"],["manual","manual"]].map(([k,l])=><button key={k} type="button" onClick={()=>setF({...f,mode:k})} className={"py-2 rounded-xl text-sm font-semibold border "+(f.mode===k?"bg-indigo-600 text-white border-indigo-600":"bg-white border-slate-200")}>{t(l)}</button>)}</div></Field>
+    <div className="text-sm font-semibold text-slate-600 mb-2">{t("participants")}</div>
+    <div className="space-y-2 mb-3">{hs.map(h=>{const on=f.participants.includes(h.id);const sh=computeShares({...f,amount:amt},hs)[h.id];
+      return <div key={h.id} className={"flex items-center gap-2 rounded-xl border p-2 "+(on?"border-indigo-200 bg-indigo-50/50":"border-slate-200 opacity-60")}>
+        <input type="checkbox" checked={on} onChange={()=>toggle(h.id)} className="w-4 h-4 accent-indigo-600"/>
+        <span style={{background:h.color}} className="w-3 h-3 rounded-full"/>
+        <span className="flex-1 text-sm">{h.name} <span className="text-xs text-slate-400">({num(h.headcount,0)})</span></span>
+        {on&&(f.mode==="manual"?<>
+          <input type="number" min="0" className="w-24 rounded-lg border border-slate-200 px-2 py-1 text-sm" value={f.manual[h.id]??""} onChange={x=>setF({...f,manual:{...f.manual,[h.id]:x.target.value}})}/>
+          <button type="button" title={t("fill")} onClick={()=>fill(h.id)} className="text-xs px-2 py-1 rounded-lg bg-indigo-100 text-indigo-700">+</button></>
+          :<span className="text-sm font-semibold" dir="ltr">{num(sh||0)}</span>)}
+      </div>})}</div>
+    {f.mode==="manual"&&<div className={"text-sm rounded-xl p-2 mb-3 "+(bad?"bg-rose-50 text-rose-700":"bg-emerald-50 text-emerald-700")}>
+      {t("total")}: {num(manualSum)} / {num(amt)} {bad&&<b> — {t("mismatch")} {num(diff)}</b>}</div>}
+    <div className="flex gap-2 justify-end"><Btn v="s" onClick={onClose}>{t("cancel")}</Btn><Btn onClick={save} disabled={bad}>{t("save")}</Btn></div>
+  </Modal>;
+}
+function Expenses(){
+  const {s,t,num,upd,toast,ask}=useApp();
+  const [m,setM]=useState(null);
+  const open=()=>s.households.length?setM({}):toast(t("needTwo"),1);
+  const rm=e=>ask(()=>{upd(st=>({...st,expenses:st.expenses.filter(x=>x.id!==e.id)}));toast(t("eDel"))});
+  const fmtD=d=>{try{return new Date(d).toLocaleString(s.lang==="fa"?"fa-IR-u-ca-persian":"en-GB",{dateStyle:"medium",timeStyle:"short"})}catch{return d}};
+  return <div>
+    <Owes/>
+    <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold">{t("expenses")}</h2><Btn onClick={open}><Ic d={P.plus} c="w-4 h-4"/>{t("add")}</Btn></div>
+    {!s.expenses.length?<Empty icon={P.wallet} text={t("emptyE")} action={<Btn onClick={open}>{t("add")}</Btn>}/>:
+    <div className="space-y-3">{s.expenses.map(e=>{const p=s.households.find(h=>h.id===e.payer);return <Card key={e.id} className="fade flex items-center gap-3">
+      <div style={{background:p?.color||"#94a3b8"}} className="w-10 h-10 rounded-2xl shrink-0"/>
+      <div className="flex-1 min-w-0"><div className="font-bold truncate">{e.title}</div>
+        <div className="text-xs text-slate-500 truncate">{p?.name} · {t(e.category)} · {t(e.mode==="manual"?"manual":e.mode==="equal"?"equal":"perPerson")} · {fmtD(e.date)}</div>
+        {e.desc&&<div className="text-xs text-slate-400 truncate">{e.desc}</div>}</div>
+      <b><Money v={e.amount} cur={e.currency}/></b>
+      <button onClick={()=>setM(e)} className="p-2 rounded-xl hover:bg-slate-100"><Ic d={P.edit} c="w-4 h-4"/></button>
+      <button onClick={()=>rm(e)} className="p-2 rounded-xl text-rose-600 hover:bg-rose-50"><Ic d={P.trash} c="w-4 h-4"/></button>
+    </Card>})}</div>}
+    {m&&<ExpenseForm e={m.id?m:null} onClose={()=>setM(null)}/>}
+  </div>;
+}
+
+/* ============ Backup ============ */
+function Backup(){
+  const {R,t,set,toast}=useApp();
+  const ref=useRef();
+  const exp=()=>{const b=new Blob([JSON.stringify(R,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="safardanesh-backup-"+new Date().toISOString().slice(0,10)+".json";a.click();toast(t("bDone"));};
+  const imp=f=>{if(!f)return;const r=new FileReader();r.onload=()=>{try{
+    const d=normalize(JSON.parse(r.result));if(!d)throw 0;
+    set({...d,lang:R.lang});toast(t("restored"));}catch{toast(t("invalid"),1)}};r.readAsText(f);ref.current.value="";};
+  return <div><h2 className="text-xl font-bold mb-4">{t("backup")}</h2>
+    <Card className="space-y-3"><p className="text-sm text-slate-500">{t("impHint")}</p>
+      <div className="flex gap-2 flex-wrap"><Btn onClick={exp}><Ic d={P.dl} c="w-4 h-4"/>{t("export")}</Btn>
+      <Btn v="s" onClick={()=>ref.current.click()}><Ic d={P.ul} c="w-4 h-4"/>{t("import")}</Btn>
+      <input ref={ref} type="file" accept="application/json,.json" hidden onChange={e=>imp(e.target.files[0])}/></div></Card></div>;
+}
+
+/* ============ Jalali dates ============ */
+function g2j(gy,gm,gd){
+  const gdm=[0,31,59,90,120,151,181,212,243,273,304,334];
+  let jy;if(gy>1600){jy=979;gy-=1600}else{jy=0;gy-=621}
+  const gy2=gm>2?gy+1:gy;
+  let days=365*gy+Math.floor((gy2+3)/4)-Math.floor((gy2+99)/100)+Math.floor((gy2+399)/400)-80+gd+gdm[gm-1];
+  jy+=33*Math.floor(days/12053);days%=12053;
+  jy+=4*Math.floor(days/1461);days%=1461;
+  if(days>365){jy+=Math.floor((days-1)/365);days=(days-1)%365}
+  const jm=days<186?1+Math.floor(days/31):7+Math.floor((days-186)/30);
+  const jd=1+(days<186?days%31:(days-186)%30);
+  return [jy,jm,jd];
+}
+function j2g(jy,jm,jd){
+  let gy;if(jy>979){gy=1600;jy-=979}else gy=621;
+  let days=365*jy+Math.floor(jy/33)*8+Math.floor(((jy%33)+3)/4)+78+jd+(jm<7?(jm-1)*31:(jm-7)*30+186);
+  gy+=400*Math.floor(days/146097);days%=146097;
+  if(days>36524){days--;gy+=100*Math.floor(days/36524);days%=36524;if(days>=365)days++}
+  gy+=4*Math.floor(days/1461);days%=1461;
+  if(days>365){gy+=Math.floor((days-1)/365);days=(days-1)%365}
+  let gd=days+1;
+  const sa=[0,31,(gy%4===0&&gy%100!==0)||gy%400===0?29:28,31,30,31,30,31,31,30,31,30,31];
+  let gm=0;while(gm<13&&gd>sa[gm]){gd-=sa[gm];gm++}
+  return [gy,gm,gd];
+}
+const JM=["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
+const p2=n=>String(n).padStart(2,"0");
+const todayISO=()=>{const d=new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())};
+const faNum=n=>Number(n).toLocaleString("fa-IR",{useGrouping:false});
+const maxDay=(y,m)=>m<7?31:m<12?30:(g2j(...j2g(y,12,30)).join()===[y,12,30].join()?30:29);
+// date picker: Jalali selects in Persian mode, native input in English mode. value = Gregorian "YYYY-MM-DD" or ""
+function DateField({value,onChange,clearable}){
+  const {s}=useApp();
+  if(s.lang!=="fa")return <input type="date" className={inp} value={value} onChange={e=>onChange(e.target.value)}/>;
+  const td=g2j(...todayISO().split("-").map(Number));
+  const cur=value?g2j(...value.split("-").map(Number)):["","",""];
+  const ch=(i,v)=>{const p=cur.map((x,k)=>x===""?td[k]:x);p[i]=Number(v);p[2]=Math.min(p[2],maxDay(p[0],p[1]));
+    const [gy,gm,gd]=j2g(...p);onChange(gy+"-"+p2(gm)+"-"+p2(gd));};
+  const ys=[];for(let y=td[0]-3;y<=td[0]+3;y++)ys.push(y);if(cur[0]&&!ys.includes(cur[0]))ys.push(cur[0]);
+  const sel="rounded-xl border border-slate-200 px-2 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400";
+  return <div className="flex gap-1 items-center" dir="rtl">
+    <select className={sel+" w-16"} value={cur[2]} onChange={e=>ch(2,e.target.value)}>{value?null:<option value="">—</option>}{Array.from({length:cur[1]?maxDay(cur[0],cur[1]):31},(_,i)=>i+1).map(d=><option key={d} value={d}>{faNum(d)}</option>)}</select>
+    <select className={sel+" flex-1"} value={cur[1]} onChange={e=>ch(1,e.target.value)}>{value?null:<option value="">—</option>}{JM.map((m,i)=><option key={i} value={i+1}>{m}</option>)}</select>
+    <select className={sel+" w-20"} value={cur[0]} onChange={e=>ch(0,e.target.value)}>{value?null:<option value="">—</option>}{ys.sort().map(y=><option key={y} value={y}>{faNum(y)}</option>)}</select>
+    {clearable&&value&&<button type="button" onClick={()=>onChange("")} className="p-1 text-slate-400 hover:text-rose-600"><Ic d={P.x} c="w-4 h-4"/></button>}
+  </div>;
+}
+function DateTimeField({value,onChange}){
+  const {s}=useApp();
+  if(s.lang!=="fa")return <input type="datetime-local" className={inp} value={value} onChange={e=>onChange(e.target.value)}/>;
+  const [d,tm]=(value||"").split("T");
+  return <div className="flex gap-2 items-center flex-wrap">
+    <DateField value={d||""} onChange={v=>onChange(v+"T"+(tm||"12:00"))}/>
+    <input type="time" dir="ltr" className="rounded-xl border border-slate-200 px-2 py-2 text-sm" value={tm||"12:00"} onChange={e=>onChange((d||todayISO())+"T"+e.target.value)}/>
+  </div>;
+}
+const fmtDate=(d,lang,withTime)=>{if(!d)return"";try{const x=new Date(d.length>10?d:d+"T00:00");return x.toLocaleString(lang==="fa"?"fa-IR-u-ca-persian":"en-GB",withTime?{dateStyle:"medium",timeStyle:"short"}:{dateStyle:"medium"})}catch{return d}};
+
+/* ============ Messages ============ */
+const copyText=(txt,ok)=>{try{const a=document.createElement("textarea");a.value=txt;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();ok()}catch{}};
+const sendSms=(phone,body)=>{const a=document.createElement("a");a.href="sms:"+(phone||"").replace(/[^\d+]/g,"")+"?&body="+encodeURIComponent(body);a.click();};
+const plansOf=tr=>{const L=ledger(tr.households,tr.expenses);return Object.keys(L).map(c=>[c,simplify(L[c])]).filter(([,p])=>p.length)};
+const sKey=(c,x)=>`${c}|${x.from}|${x.to}|${x.amount}`;
+// personal message for one household
+function memberMsg(tr,h,t,num){
+  const nm=id=>tr.households.find(x=>x.id===id)||{name:"?"},fmt=(v,c)=>num(v)+" "+t(c);
+  const L=[tr.name+" – "+h.name];
+  plansOf(tr).forEach(([c,p])=>p.forEach(x=>{if(tr.settled[sKey(c,x)]?.done)return;
+    if(x.from===h.id){const o=nm(x.to);L.push(t("youPay")+" "+o.name+": "+fmt(x.amount,c)+(o.card?" ("+t("card")+": "+o.card+")":""));}
+    if(x.to===h.id)L.push(t("youGet")+" "+nm(x.from).name+": "+fmt(x.amount,c));}));
+  if(L.length===1)L.push(t("allDone"));
+  return L.join("\n");
+}
+// group message: every expense with its payer, then who pays whom
+function groupMsg(tr,t,num,lang){
+  const nm=id=>tr.households.find(x=>x.id===id)?.name||"?",fmt=(v,c)=>num(v)+" "+t(c);
+  const out=[tr.name+(tr.dest?" – "+tr.dest:""),"","🧾 "+t("expenses")+":"];
+  if(!tr.expenses.length)out.push("—");
+  [...tr.expenses].sort((a,b)=>String(a.date).localeCompare(String(b.date))).forEach((e,i)=>
+    out.push(num(i+1,0)+". "+e.title+" ("+t(e.category)+") – "+fmt(e.amount,e.currency)+" – "+t("payer")+": "+nm(e.payer)+" – "+fmtDate(e.date,lang)));
+  out.push("","💸 "+t("whoOwes")+":");
+  const P2=plansOf(tr);
+  if(!P2.length)out.push(t("allDone"));
+  P2.forEach(([c,p])=>p.forEach(x=>out.push(nm(x.from)+" "+t("pays")+" "+nm(x.to)+": "+fmt(x.amount,c)+(tr.settled[sKey(c,x)]?.done?" ✅":""))));
+  return out.join("\n");
+}
+
+/* ============ Trips ============ */
+function TripForm({tr,onClose}){
+  const {t,raw,toast}=useApp();
+  const [f,setF]=useState({name:"",dest:"",start:"",end:"",notes:"",link:"",...(tr||{})});
+  const [hs,setHs]=useState(()=>tr&&tr.households.length?tr.households.map(h=>({phone:"",card:"",...h})):[{id:uid(),name:"",headcount:2,color:COLORS[0],phone:"",card:""}]);
+  const on=k=>e=>setF({...f,[k]:e.target.value});
+  const hset=(i,k,v)=>setHs(hs.map((h,j)=>j===i?{...h,[k]:v}:h));
+  const addH=()=>setHs([...hs,{id:uid(),name:"",headcount:2,color:COLORS[hs.length%COLORS.length],phone:"",card:""}]);
+  const rmH=i=>{const h=hs[i];if(tr&&tr.expenses.some(e=>e.payer===h.id||e.participants.includes(h.id)))return toast(t("inUse"),1);setHs(hs.filter((_,j)=>j!==i));};
+  const save=()=>{const name=f.name.trim();if(!name)return;
+    const households=hs.filter(h=>h.name.trim()).map(h=>({...h,name:h.name.trim(),headcount:Math.max(1,Math.floor(Number(h.headcount)||1))}));
+    if(!households.length)return toast(t("needTwo"),1);
+    let link=f.link.trim();if(link&&!/^https?:\/\//i.test(link))link="https://"+link;
+    const v={name,dest:f.dest.trim(),start:f.start,end:f.end,notes:f.notes,link,households};
+    if(tr)raw(R=>({...R,trips:R.trips.map(x=>x.id===tr.id?{...x,...v}:x)}));
+    else{const nt=mkTrip(name,v);raw(R=>({...R,trips:[...R.trips,nt],activeId:nt.id}));}
+    toast(t("tripSaved"));onClose();};
+  return <Modal title={t(tr?"edit":"newTrip")} onClose={onClose}>
+    <Field label={t("tripName")}><input className={inp} value={f.name} autoFocus onChange={on("name")}/></Field>
+    <Field label={t("dest")}><input className={inp} value={f.dest} onChange={on("dest")}/></Field>
+    <div className="grid sm:grid-cols-2 gap-3">
+      <Field label={t("start")}><DateField clearable value={f.start} onChange={v=>setF({...f,start:v})}/></Field>
+      <Field label={t("end")}><DateField clearable value={f.end} onChange={v=>setF({...f,end:v})}/></Field></div>
+    <Field label={t("notes")}><textarea rows="2" className={inp} value={f.notes} onChange={on("notes")}/></Field>
+    <Field label={t("link")+" ("+t("optional")+")"}><input dir="ltr" className={inp} value={f.link} placeholder="https://t.me/..." onChange={on("link")}/><span className="block text-xs text-slate-400 mt-1">{t("linkHint")}</span></Field>
+    <div className="flex items-center justify-between mt-2 mb-2"><div className="font-bold">{t("households")}</div><Btn v="s" className="!py-1 !px-3" onClick={addH}><Ic d={P.plus} c="w-4 h-4"/>{t("add")}</Btn></div>
+    <div className="space-y-3 mb-4">{hs.map((h,i)=><div key={h.id} className="rounded-2xl border border-slate-200 p-3 space-y-2">
+      <div className="flex items-center gap-2">
+        <button type="button" title={t("color")} onClick={()=>hset(i,"color",COLORS[(COLORS.indexOf(h.color)+1)%COLORS.length])} style={{background:h.color}} className="w-8 h-8 rounded-full shrink-0"/>
+        <input className={inp} placeholder={t("name")} value={h.name} onChange={e=>hset(i,"name",e.target.value)}/>
+        <input type="number" min="1" className={inp+" !w-20"} title={t("headcount")} value={h.headcount} onChange={e=>hset(i,"headcount",e.target.value)}/>
+        <button type="button" onClick={()=>rmH(i)} className="p-2 rounded-xl text-rose-600 hover:bg-rose-50"><Ic d={P.trash} c="w-4 h-4"/></button></div>
+      <div className="grid sm:grid-cols-2 gap-2">
+        <input type="tel" dir="ltr" className={inp} placeholder={t("phone")+" ("+t("optional")+")"} value={h.phone} onChange={e=>hset(i,"phone",e.target.value)}/>
+        <input inputMode="numeric" dir="ltr" className={inp} placeholder={t("card")+" ("+t("optional")+")"} value={h.card} onChange={e=>hset(i,"card",e.target.value)}/></div>
+    </div>)}</div>
+    <div className="flex gap-2 justify-end"><Btn v="s" onClick={onClose}>{t("cancel")}</Btn><Btn onClick={save} disabled={!f.name.trim()}>{t("save")}</Btn></div></Modal>;
+}
+function GroupModal({tr,onClose}){
+  const {t,num,s,toast}=useApp();
+  const txt=groupMsg(tr,t,num,s.lang);
+  return <Modal title={t("groupMsg")+" – "+tr.name} onClose={onClose}>
+    <textarea readOnly rows="14" className={inp+" text-sm"} value={txt}/>
+    <div className="flex gap-2 justify-end mt-3 flex-wrap">
+      {tr.link&&<a href={tr.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 rounded-2xl text-sm font-semibold bg-white text-slate-700 border border-slate-200">{t("openGroup")}</a>}
+      <Btn onClick={()=>copyText(txt,()=>toast(t("copied")))}>{t("copy")}</Btn></div></Modal>;
+}
+function TripsPage(){
+  const {R,s,t,num,raw,ask,toast}=useApp();
+  const [m,setM]=useState(null),[g,setG]=useState(null);
+  const range=x=>[fmtDate(x.start,s.lang),fmtDate(x.end,s.lang)].filter(Boolean).join(" → ");
+  const del=tr=>{if(R.trips.length<2)return toast(t("lastTrip"),1);
+    ask(()=>{raw(x=>{const rest=x.trips.filter(y=>y.id!==tr.id);return {...x,trips:rest,activeId:x.activeId===tr.id?rest[0].id:x.activeId}});toast(t("tripDel"))});};
+  return <div>
+    <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold">{t("tripsDb")}</h2><Btn onClick={()=>setM({})}><Ic d={P.plus} c="w-4 h-4"/>{t("newTrip")}</Btn></div>
+    <div className="grid gap-3 md:grid-cols-2">{R.trips.map(tr=>{const on=tr.id===R.activeId;
+      return <Card key={tr.id} className={"fade "+(on?"ring-2 ring-indigo-500":"")}>
+        <div className="cursor-pointer" onClick={()=>raw(x=>({...x,activeId:tr.id}))}>
+          <div className="flex items-center gap-2"><b className="flex-1 truncate">{tr.name}</b>{on&&<span className="text-[11px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">{t("active")}</span>}</div>
+          <div className="text-xs text-slate-500 mt-1">{[tr.dest,range(tr)].filter(Boolean).join(" · ")||"—"}</div>
+          {tr.notes&&<div className="text-xs text-slate-400 mt-1 whitespace-pre-wrap">{tr.notes}</div>}
+          <div className="flex flex-wrap gap-1 mt-2">{tr.households.map(h=><span key={h.id} style={{background:h.color}} className="text-[11px] text-white px-2 py-0.5 rounded-full">{h.name} · {num(h.headcount,0)}</span>)}</div>
+          <div className="text-xs text-slate-400 mt-2">{num(tr.households.length,0)} {t("households")} · {num(tr.expenses.length,0)} {t("expensesN")}</div></div>
+        <div className="flex gap-1 mt-3 items-center flex-wrap">
+          <Btn v="s" className="!py-1 !px-3" onClick={()=>setG(tr)}><Ic d={P.sms} c="w-4 h-4"/>{t("groupMsg")}</Btn>
+          {tr.link&&<a href={tr.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1 rounded-2xl text-sm font-semibold bg-white text-slate-700 border border-slate-200">{t("openGroup")}</a>}
+          <span className="flex-1"/>
+          <button onClick={()=>setM(tr)} className="p-2 rounded-xl hover:bg-slate-100"><Ic d={P.edit} c="w-4 h-4"/></button>
+          <button onClick={()=>del(tr)} className="p-2 rounded-xl text-rose-600 hover:bg-rose-50"><Ic d={P.trash} c="w-4 h-4"/></button></div>
+      </Card>})}</div>
+    {m&&<TripForm tr={m.id?m:null} onClose={()=>setM(null)}/>}
+    {g&&<GroupModal tr={g} onClose={()=>setG(null)}/>}
+  </div>;
+}
+
+/* ============ Who owes whom (top of Expenses tab) ============ */
+function Owes(){
+  const {s,t,upd,toast,num}=useApp();
+  const plans=plansOf(s);
+  const hh=id=>s.households.find(h=>h.id===id)||{name:"?",color:"#94a3b8"};
+  const setS=(k,patch)=>upd(st=>({...st,settled:{...st.settled,[k]:{...st.settled[k],...patch}}}));
+  const tell=h=>{const m=memberMsg(s,h,t,num);h.phone?sendSms(h.phone,m):copyText(m,()=>toast(t("copied")));};
+  if(!plans.length)return null;
+  return <Card className="mb-5"><div className="font-bold mb-3">{t("whoOwes")}</div>
+    <div className="space-y-2">{plans.map(([c,p])=>p.map(x=>{const k=sKey(c,x),st=s.settled[k]||{},a=hh(x.from),b=hh(x.to);
+      return <div key={k} className="fade flex flex-wrap items-center gap-2 text-sm">
+        <input type="checkbox" checked={!!st.done} onChange={e=>setS(k,{done:e.target.checked})} className="w-4 h-4 accent-emerald-600"/>
+        <span className={"flex-1 min-w-[10rem] "+(st.done?"line-through text-slate-400":"")}>
+          <b style={{color:a.color}}>{a.name}</b>
+          <button type="button" title={a.phone?t("sendSms"):t("copy")} onClick={()=>tell(a)} className="mx-1 p-1 rounded-lg text-indigo-600 hover:bg-indigo-50 align-middle"><Ic d={P.sms} c="w-4 h-4"/></button>
+          {t("pays")} <b style={{color:b.color}}>{b.name}</b></span>
+        <b className={st.done?"line-through text-slate-400":""}><Money v={x.amount} cur={c}/></b>
+        <select value={st.method||"cash"} onChange={e=>setS(k,{method:e.target.value})} className="rounded-xl border border-slate-200 px-2 py-1 text-xs bg-white">{["cash","transfer","wallet"].map(m=><option key={m} value={m}>{t(m)}</option>)}</select>
+      </div>}))}</div></Card>;
+}
+
+/* ============ PWA install prompt ============ */
+function InstallBanner(){
+  const {t}=useApp();
+  const [ev,setEv]=useState(null);
+  const [hide,setHide]=useState(()=>{try{return localStorage.getItem("sd-install-hide")==="1"}catch{return false}});
+  const standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  useEffect(()=>{const h=e=>{e.preventDefault();setEv(e)};const a=()=>setEv(null);
+    window.addEventListener("beforeinstallprompt",h);window.addEventListener("appinstalled",a);
+    return()=>{window.removeEventListener("beforeinstallprompt",h);window.removeEventListener("appinstalled",a)}},[]);
+  const close=()=>{setHide(true);try{localStorage.setItem("sd-install-hide","1")}catch{}};
+  if(standalone||hide||(!ev&&!ios))return null;
+  return <div className="fade fixed inset-x-4 bottom-20 md:bottom-4 md:inset-x-auto md:end-4 md:max-w-sm z-40 bg-slate-900 text-white rounded-2xl shadow-xl p-4">
+    <div className="font-bold mb-1">{t("installApp")}</div>
+    <div className="text-xs text-slate-300 mb-3">{ev?t("installHint"):t("iosHint")}</div>
+    <div className="flex gap-2 justify-end"><Btn v="s" className="!py-1" onClick={close}>{t("later")}</Btn>
+      {ev&&<Btn className="!py-1" onClick={async()=>{ev.prompt();try{await ev.userChoice}catch{}setEv(null)}}>{t("install")}</Btn>}</div></div>;
+}
+
+/* ============ Shell ============ */
+function App(){
+  const {s,t,upd,R}=useApp();
+  const [tab,setTab]=useState("trips");
+  const tabs=[["trips",P.users],["expenses",P.wallet],["backup",P.db]];
+  const View={trips:TripsPage,expenses:Expenses,backup:Backup}[tab];
+  const Nav=({side})=>tabs.map(([k,ic])=><button key={k} onClick={()=>setTab(k)} className={(side?"flex-row w-full px-4 py-3 gap-3 rounded-2xl ":"flex-col flex-1 py-2 text-[11px] ")+"flex items-center justify-center font-semibold transition "+(tab===k?"text-indigo-600 "+(side?"bg-indigo-50":""):"text-slate-400 hover:text-slate-600")}><Ic d={ic}/>{t(k)}</button>);
+  return <div className="min-h-screen md:flex">
+    <aside className="hidden md:flex flex-col w-60 bg-white shadow-sm p-4 gap-2 sticky top-0 h-screen">
+      <div className="mb-4"><div className="text-xl font-bold text-indigo-600">{t("app")}</div><div className="text-xs text-slate-400">{t("sub")}</div></div><Nav side/></aside>
+    <main className="flex-1 max-w-4xl w-full mx-auto p-4 pb-28 md:pb-8">
+      <header className="flex items-center justify-between mb-5 md:justify-end">
+        <div className="md:hidden font-bold text-lg text-indigo-600">{t("app")}</div>
+        <Btn v="s" onClick={()=>upd(st=>({...st,lang:st.lang==="en"?"fa":"en"}))}><Ic d={P.globe} c="w-4 h-4"/>{t("lang")}</Btn></header>
+      <div className="text-xs text-slate-400 mb-3">{t("active")}: <b className="text-slate-600">{s.name}</b></div>
+      <div key={tab+s.lang+R.activeId} className="fade"><View/></div></main>
+    <InstallBanner/>
+    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur shadow-[0_-4px_20px_rgba(0,0,0,.06)] flex" style={{paddingBottom:"env(safe-area-inset-bottom,0px)"}}><Nav/></nav>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Provider><App/></Provider>);
+</script>
+</body>
+</html>
